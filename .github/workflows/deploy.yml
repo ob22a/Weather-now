@@ -21,7 +21,7 @@ jobs:
       - run: npm test
         working-directory: ./server
       - name: Deploy Backend
-        uses: render-examples/deploy@v1
+        uses: JorgeLNJunior/render-deploy@v1.4.6
         with:
           api_key: ${{ secrets.RENDER_API_KEY_BACKEND }}
           service_id: ${{ secrets.RENDER_SERVICE_ID_BACKEND }}
@@ -43,7 +43,7 @@ jobs:
       - run: npm test
         working-directory: ./client
       - name: Deploy Frontend
-        uses: render-examples/deploy@v1
+        uses: JorgeLNJunior/render-deploy@v1.4.6
         with:
           api_key: ${{ secrets.RENDER_API_KEY_FRONTEND }}
           service_id: ${{ secrets.RENDER_SERVICE_ID_FRONTEND }}
