@@ -1,0 +1,49 @@
+name: Deploy Fullstack # This is manual for now since we are in the early stage of development
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deploy environment'
+        required: true
+        default: 'production'
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+        working-directory: ./server
+      - run: npm test
+        working-directory: ./server
+      - name: Deploy Backend
+        uses: render-examples/deploy@v1
+        with:
+          api_key: ${{ secrets.RENDER_API_KEY_BACKEND }}
+          service_id: ${{ secrets.RENDER_SERVICE_ID_BACKEND }}
+
+  frontend:
+    needs: backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+        working-directory: ./client
+      - run: npm run build
+        working-directory: ./client
+        env:
+          VITE_API_URL: https://myapp-backend.onrender.com # This is just a placeholder
+      - run: npm test
+        working-directory: ./client
+      - name: Deploy Frontend
+        uses: render-examples/deploy@v1
+        with:
+          api_key: ${{ secrets.RENDER_API_KEY_FRONTEND }}
+          service_id: ${{ secrets.RENDER_SERVICE_ID_FRONTEND }}
