@@ -7,7 +7,7 @@ describe("App component", () => {
   it("renders the greeting message", () => {
     render(<App />);
     // Look for the text in the document
-    const heading = screen.getByText(/hello/i);
+    const heading = screen.getByText(/hello Weather-now/i);
     expect(heading).toBeDefined();
   });
 });
