@@ -1,0 +1,15 @@
+{
+  "name": "weathernow",
+  "version": "1.0.0",
+  "description": "The backend for a simple weather web app",
+  "license": "MIT",
+  "author": "Obssa Degefu/Ob22a",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "test": "jest --passWithNoTests --runInBand"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
