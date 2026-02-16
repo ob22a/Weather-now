@@ -1,8 +1,10 @@
-import {Country} from '../models/Countries.js';
+import { Country } from '../models/Countries.js';
 import { IpApiLocationProvider } from '../providers/LocationProviders.js';
 import { type DetectedLocation } from '../providers/LocationProviders.js';
+import { RestCountriesProvider } from '../providers/CountriesProviders.js';
 
 const locationProvider = new IpApiLocationProvider();
+const countriesProvider = new RestCountriesProvider();
 
 export const userLocation = async (): Promise<DetectedLocation> => {
     return await locationProvider.detectLocation();
@@ -14,8 +16,19 @@ export const searchLocations = async (text: string) => {
         Country.find({ name: regex }).limit(10),
         Country.find({ city: regex }).limit(10)
     ]);
-    return [...countries, ...cities].map(item => ({
+
+    const localResults = [...countries, ...cities].map(item => ({
         name: item.name,
         city: item.city
     }));
+
+    if (localResults.length === 0) {
+        const externalResults = await countriesProvider.searchCity(text);
+        return externalResults.map(r => ({
+            name: r.country,
+            city: r.name
+        }));
+    }
+
+    return localResults;
 };
