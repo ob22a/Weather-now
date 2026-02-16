@@ -1,8 +1,8 @@
-import { type countriesAPIResponse } from "../types/api.js";
+import { type countriesAPIResponse, type GeocodingAPIResponse, type GeocodingResult } from "../types/api.js";
 
 abstract class CountriesProvider {
     abstract fetchCountriesData(): Promise<countriesAPIResponse[]>
-    abstract resolveCity(city: string, country: string): Promise<any>;
+    abstract resolveCity(city: string, country: string): Promise<GeocodingResult | null>;
 }
 
 export class RestCountriesProvider extends CountriesProvider {
@@ -13,16 +13,16 @@ export class RestCountriesProvider extends CountriesProvider {
         return countriesData;
     }
 
-    async resolveCity(city: string, country: string): Promise<any> {
+    async resolveCity(city: string, country: string): Promise<GeocodingResult | null> {
         const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=10&language=en&format=json`;
         const response = await fetch(url);
         if (!response.ok) throw new Error('Failed to fetch city resolution data');
 
-        const data = await response.json();
+        const data: GeocodingAPIResponse = await response.json();
         const results = data.results || [];
 
         // Find a result that matches the country
-        const match = results.find((r: any) => r.country.toLowerCase() === country.toLowerCase());
+        const match = results.find((r) => r.country.toLowerCase() === country.toLowerCase());
         return match || results[0] || null;
     }
 }
