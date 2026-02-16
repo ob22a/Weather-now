@@ -9,7 +9,7 @@
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --passWithNoTests --runInBand",
     "start": "node dist/server.js",
-    "dev": "nodemon src/server.ts",
+    "dev": "nodemon dist/server.js",
     "build": "tsc"
   },
   "devDependencies": {
