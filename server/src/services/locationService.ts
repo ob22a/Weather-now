@@ -1,10 +1,10 @@
 import { Country } from '../models/Countries.js';
 import { IpApiLocationProvider } from '../providers/LocationProviders.js';
 import { type DetectedLocation } from '../providers/LocationProviders.js';
-import { RestCountriesProvider } from '../providers/CountriesProviders.js';
+import { GeoCodingCountriesProvider } from '../providers/CountriesProviders.js';
 
 const locationProvider = new IpApiLocationProvider();
-const countriesProvider = new RestCountriesProvider();
+const countriesProvider = new GeoCodingCountriesProvider();
 
 export const userLocation = async (): Promise<DetectedLocation> => {
     return await locationProvider.detectLocation();

@@ -1,12 +1,13 @@
-import { RestCountriesProvider } from "../providers/CountriesProviders.js";
+import { RestCountriesProvider, GeoCodingCountriesProvider } from "../providers/CountriesProviders.js";
 import type { CountryType } from "../types/dbInterface.js";
 
 
-const countriesProvider = new RestCountriesProvider();
+const restCountriesProvider = new RestCountriesProvider();
+const geoCodingCountriesProvider = new GeoCodingCountriesProvider();
 
 // Legacy  code initially fetched and recorded the countries data in the database. Now we fetch and filter the countries data on demand, and store it in the database for future use. This way we can ensure we have the most up-to-date data without relying on a separate population step. The populateCountriesController is kept for backward compatibility and can be used to manually trigger a refresh of the countries data if needed.
 export const fetchAndFilterCountriesData = async () => {
-    const countriesData = await countriesProvider.fetchCountriesData();
+    const countriesData = await restCountriesProvider.fetchCountriesData();
 
     if (!countriesData || countriesData.length === 0) {
         throw new Error('No countries data found from API');
@@ -25,7 +26,7 @@ export const fetchAndFilterCountriesData = async () => {
 }
 
 export const resolveAndSaveCity = async (city: string, country: string) => {
-    const resolved = await countriesProvider.resolveCity(city, country);
+    const resolved = await geoCodingCountriesProvider.resolveCity(city, country);
 
     if (!resolved) {
         throw new Error(`Could not resolve coordinates for ${city}, ${country}`);

@@ -1,19 +1,24 @@
 import { type countriesAPIResponse, type GeocodingAPIResponse, type GeocodingResult } from "../types/api.js";
 
 abstract class CountriesProvider {
-    abstract fetchCountriesData(): Promise<countriesAPIResponse[]>
     abstract resolveCity(city: string, country: string): Promise<GeocodingResult | null>;
     abstract searchCity(text: string): Promise<GeocodingResult[]>;
 }
 
-export class RestCountriesProvider extends CountriesProvider {
+abstract class LegacyCountriesProvider {
+    abstract fetchCountriesData(): Promise<countriesAPIResponse[]>
+}
+
+export class RestCountriesProvider extends LegacyCountriesProvider {
     async fetchCountriesData(): Promise<countriesAPIResponse[]> {
         const response = await fetch('https://restcountries.com/v3.1/all');
         if (!response.ok) throw new Error('Failed to fetch countries data from Rest Countries API');
         const countriesData: countriesAPIResponse[] = await response.json();
         return countriesData;
     }
+}
 
+export class GeoCodingCountriesProvider extends CountriesProvider{
     async resolveCity(city: string, country: string): Promise<GeocodingResult | null> {
         const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=10&language=en&format=json`;
         const response = await fetch(url);
