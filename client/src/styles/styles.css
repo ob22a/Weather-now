@@ -493,6 +493,98 @@ aside{
     }
   }
 
+.error-page{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 24px 48px;
+}
+
+.error-page__header{
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 48px;
+}
+
+.error-page__panel{
+    width: 100%;
+    max-width: 560px;
+    background-color: hsl(243, 23%, 24%);
+    border: 1px solid hsl(243, 23%, 34%);
+    border-radius: 16px;
+    padding: 40px 32px;
+    text-align: center;
+    box-shadow: 0 24px 48px rgba(8, 6, 28, 0.35);
+}
+
+.error-page__icon-wrap{
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    background-color: hsl(243, 23%, 30%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-page__icon{
+    width: 48px;
+    height: 48px;
+}
+
+.error-page__eyebrow{
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: hsl(250, 6%, 74%);
+    margin-bottom: 8px;
+}
+
+.error-page__title{
+    font-size: 2rem;
+    margin-bottom: 12px;
+}
+
+.error-page__message{
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: hsl(250, 6%, 90%);
+    margin-bottom: 12px;
+}
+
+.error-page__hint{
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: hsl(250, 6%, 74%);
+    margin-bottom: 28px;
+}
+
+.error-page__retry{
+    min-width: 220px;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 12px;
+    background-color: hsl(233, 67%, 56%);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.15s ease, opacity 0.2s ease;
+}
+
+.error-page__retry:hover:not(:disabled){
+    background-color: hsl(233, 67%, 48%);
+    outline: none;
+}
+
+.error-page__retry:disabled{
+    opacity: 0.72;
+    cursor: wait;
+}
+
 @media (max-width: 1200px) {
     main{
         display: flex;

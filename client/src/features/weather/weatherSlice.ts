@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { WeatherData } from '../../types/APIdata';
+import type { AppErrorKind } from '../../utils/apiErrors';
 import {
   fetchWeatherForLocation,
   initializeApp,
@@ -11,12 +12,14 @@ interface WeatherState {
   data: WeatherData | null;
   isLoading: boolean;
   error: string | null;
+  errorKind: AppErrorKind | null;
 }
 
 const initialState: WeatherState = {
   data: null,
   isLoading: true,
   error: null,
+  errorKind: null,
 };
 
 const weatherSlice = createSlice({
@@ -25,17 +28,21 @@ const weatherSlice = createSlice({
   reducers: {
     clearWeatherError(state) {
       state.error = null;
+      state.errorKind = null;
     },
   },
   extraReducers: (builder) => {
     const setPending = (state: WeatherState) => {
       state.isLoading = true;
-      state.error = null;
     };
 
-    const setRejected = (state: WeatherState, message: string | undefined) => {
+    const setRejected = (
+      state: WeatherState,
+      payload: { message: string; kind: AppErrorKind } | undefined,
+    ) => {
       state.isLoading = false;
-      state.error = message ?? 'Unable to load weather data. Please try again.';
+      state.error = payload?.message ?? 'Unable to load weather data. Please try again.';
+      state.errorKind = payload?.kind ?? 'general';
     };
 
     builder
@@ -44,6 +51,7 @@ const weatherSlice = createSlice({
         state.isLoading = false;
         state.data = action.payload.weather;
         state.error = null;
+        state.errorKind = null;
       })
       .addCase(initializeApp.rejected, (state, action) => {
         setRejected(state, action.payload);
@@ -53,6 +61,7 @@ const weatherSlice = createSlice({
         state.isLoading = false;
         state.data = action.payload;
         state.error = null;
+        state.errorKind = null;
       })
       .addCase(fetchWeatherForLocation.rejected, (state, action) => {
         setRejected(state, action.payload);
@@ -62,6 +71,7 @@ const weatherSlice = createSlice({
         state.isLoading = false;
         state.data = action.payload.weather;
         state.error = null;
+        state.errorKind = null;
       })
       .addCase(selectSearchResult.rejected, (state, action) => {
         setRejected(state, action.payload);
@@ -71,6 +81,7 @@ const weatherSlice = createSlice({
         state.isLoading = false;
         state.data = action.payload;
         state.error = null;
+        state.errorKind = null;
       })
       .addCase(refreshCurrentWeather.rejected, (state, action) => {
         setRejected(state, action.payload);

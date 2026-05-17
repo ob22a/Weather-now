@@ -4,11 +4,15 @@ import type { SearchResultItem, WeatherData } from '../../types/APIdata';
 import { setLocation, type Location } from '../location/locationSlice';
 import { clearSearchResults } from '../search/searchSlice';
 import type { RootState } from '../../app/store';
+import type { AppErrorKind } from '../../utils/apiErrors';
+import { getErrorDetails, toRejectPayload } from '../../utils/apiErrors';
+
+type WeatherReject = { message: string; kind: AppErrorKind };
 
 export const initializeApp = createAsyncThunk<
   { location: Location; weather: WeatherData },
   void,
-  { rejectValue: string }
+  { rejectValue: WeatherReject }
 >('weather/initialize', async (_, { dispatch, rejectWithValue }) => {
   try {
     const locationResponse = await fetchMyLocation();
@@ -20,53 +24,78 @@ export const initializeApp = createAsyncThunk<
 
     const weatherResponse = await fetchWeather(location.country, location.city);
     return { location, weather: weatherResponse.weather };
-  } catch {
-    return rejectWithValue('Unable to detect your location. Please search manually.');
+  } catch (error) {
+    const locationDetails = getErrorDetails(
+      error,
+      'Unable to detect your location. Please search manually.',
+    );
+
+    if (locationDetails.kind === 'connection') {
+      return rejectWithValue(toRejectPayload(error, locationDetails.message));
+    }
+
+    return rejectWithValue(
+      toRejectPayload(
+        error,
+        'Unable to detect your location. Please search manually.',
+        'location',
+      ),
+    );
   }
 });
 
 export const fetchWeatherForLocation = createAsyncThunk<
   WeatherData,
   Location,
-  { rejectValue: string }
+  { rejectValue: WeatherReject }
 >('weather/fetchForLocation', async (location, { rejectWithValue }) => {
   try {
     const response = await fetchWeather(location.country, location.city);
     return response.weather;
-  } catch {
-    return rejectWithValue('Unable to load weather data. Please try again.');
+  } catch (error) {
+    return rejectWithValue(
+      toRejectPayload(error, 'Unable to load weather data. Please try again.'),
+    );
   }
 });
 
 export const refreshCurrentWeather = createAsyncThunk<
   WeatherData,
   void,
-  { state: RootState; rejectValue: string }
+  { state: RootState; rejectValue: WeatherReject }
 >('weather/refresh', async (_, { getState, rejectWithValue }) => {
   const location = getState().location.current;
   if (!location) {
-    return rejectWithValue('No location selected.');
+    return rejectWithValue({
+      message: 'No location selected.',
+      kind: 'general',
+    });
   }
 
   try {
     const response = await fetchWeather(location.country, location.city);
     return response.weather;
-  } catch {
-    return rejectWithValue('Unable to load weather data. Please try again.');
+  } catch (error) {
+    return rejectWithValue(
+      toRejectPayload(error, 'Unable to load weather data. Please try again.'),
+    );
   }
 });
 
 export const selectSearchResult = createAsyncThunk<
   { location: Location; weather: WeatherData },
   SearchResultItem,
-  { state: RootState; rejectValue: string }
+  { state: RootState; rejectValue: WeatherReject }
 >('weather/selectSearchResult', async (item, { getState, dispatch, rejectWithValue }) => {
   const currentLocation = getState().location.current;
   const country = item.name ?? currentLocation?.country;
   const city = item.city ?? currentLocation?.city;
 
   if (!country || !city) {
-    return rejectWithValue('Selected result is missing required location details.');
+    return rejectWithValue({
+      message: 'Selected result is missing required location details.',
+      kind: 'general',
+    });
   }
 
   const location: Location = { country, city };
@@ -76,7 +105,9 @@ export const selectSearchResult = createAsyncThunk<
   try {
     const response = await fetchWeather(location.country, location.city);
     return { location, weather: response.weather };
-  } catch {
-    return rejectWithValue('Unable to load weather data. Please try again.');
+  } catch (error) {
+    return rejectWithValue(
+      toRejectPayload(error, 'Unable to load weather data. Please try again.'),
+    );
   }
 });

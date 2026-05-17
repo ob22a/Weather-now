@@ -27,13 +27,18 @@ class ErrorBoundary extends Component<Props, State> {
     console.error('Uncaught render error:', error, info.componentStack);
   }
 
+  private handleRetry = () => {
+    this.setState({ hasError: false, message: '' });
+    window.location.reload();
+  };
+
   render() {
     if (this.state.hasError) {
       return (
         <ErrorPage
           message={this.state.message}
-          title="Something went wrong"
-          showRetry={false}
+          kind="general"
+          onRetry={this.handleRetry}
         />
       );
     }
