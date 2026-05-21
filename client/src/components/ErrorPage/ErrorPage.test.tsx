@@ -9,17 +9,35 @@ const renderWithStore = (ui: React.ReactElement) => {
 };
 
 describe('ErrorPage', () => {
-  it('renders the error message and retry action', () => {
+  it('renders connection error content and retry action', () => {
     const onRetry = jest.fn();
 
     renderWithStore(
-      <ErrorPage message="Unable to load weather data." onRetry={onRetry} />,
+      <ErrorPage
+        message="Unable to reach the WeatherNow server."
+        kind="connection"
+        onRetry={onRetry}
+      />,
     );
 
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-    expect(screen.getByText('Unable to load weather data.')).toBeInTheDocument();
+    expect(screen.getByText('Unable to connect')).toBeInTheDocument();
+    expect(screen.getByText('Unable to reach the WeatherNow server.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /retry connection/i })).toBeInTheDocument();
 
-    screen.getByRole('button', { name: /try again/i }).click();
+    screen.getByRole('button', { name: /retry connection/i }).click();
     expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows reconnecting state while retry is in progress', () => {
+    renderWithStore(
+      <ErrorPage
+        message="Unable to reach the WeatherNow server."
+        kind="connection"
+        onRetry={jest.fn()}
+        isRetrying
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: /reconnecting/i })).toBeDisabled();
   });
 });
