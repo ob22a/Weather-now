@@ -83,4 +83,4 @@ Optional: set `VITE_API_BASE_URL` in `client/.env` for a custom API endpoint.
 
 ## License
 
-MIT
+MIT © [Obssa Degefu](LICENSE)
