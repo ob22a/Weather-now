@@ -1,4 +1,5 @@
-import { AppError, errorHandler } from './errorHandler.js';
+import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { AppError, errorHandler, notFoundHandler } from './errorHandler.js';
 
 describe('AppError', () => {
   it('stores status code and message', () => {
@@ -8,7 +9,32 @@ describe('AppError', () => {
   });
 });
 
+describe('notFoundHandler', () => {
+  it('returns a 404 JSON payload for unknown routes', () => {
+    const json = jest.fn();
+    const status = jest.fn(() => ({ json }));
+
+    notFoundHandler(
+      { method: 'GET', originalUrl: '/api/missing' } as never,
+      { status } as never,
+    );
+
+    expect(status).toHaveBeenCalledWith(404);
+    expect(json).toHaveBeenCalledWith({
+      message: 'Route not found: GET /api/missing',
+    });
+  });
+});
+
 describe('errorHandler', () => {
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('returns structured JSON for AppError', () => {
     const json = jest.fn();
     const status = jest.fn(() => ({ json }));

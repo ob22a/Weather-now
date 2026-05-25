@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals';
 import { weatherCodeConvertor, isExpired } from './status.js';
 
 describe('weatherCodeConvertor', () => {
